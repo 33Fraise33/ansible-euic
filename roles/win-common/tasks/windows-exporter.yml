@@ -1,0 +1,29 @@
+---
+- name: Copy windows_exporter installer (if internet is slow)
+  ansible.windows.win_copy:
+    src: windows_exporter-{{ windows_exporter_version }}-amd64.msi
+    dest: C:\Users\{{ ansible_user }}\Downloads\windows_exporter-{{ windows_exporter_version }}-amd64.msi
+
+- name: Install windows_exporter
+  ansible.windows.win_package:
+    path: C:\Users\{{ ansible_user }}\Downloads\windows_exporter-{{ windows_exporter_version }}-amd64.msi
+    creates_service: windows_exporter
+    arguments:
+      - /quiet
+      - /norestart
+      - ENABLED_COLLECTORS=cs,cpu,logical_disk,memory,net,os,physical_disk,thermalzone
+
+- name: Set Firewall rules for windows_exporter
+  community.windows.win_firewall_rule:
+    name: "{{ item.name }}"
+    localport: "{{ item.port }}"
+    action: allow
+    direction: in
+    protocol: "{{ item.protocol }}"
+    state: present
+    enabled: true
+  loop:
+    - name: windows_exporter
+      port: 9182
+      protocol: tcp
+  tags: firewall

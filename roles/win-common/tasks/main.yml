@@ -1,0 +1,34 @@
+---
+- name: Set hostname
+  ansible.windows.win_command:
+    cmd: 'powershell.exe Rename-Computer -NewName "{{ inventory_hostname }}" -Force'
+  when: ansible_hostname != inventory_hostname
+
+- name: Change power plan to high performance
+  community.windows.win_power_plan:
+    name: high performance
+  ignore_errors: true
+
+- name: Set power config
+  ansible.windows.win_command:
+    cmd: 'C:\Windows\System32\powercfg.exe /change {{ item }} 0'
+  loop:
+    - monitor-timeout-ac
+    - monitor-timeout-dc
+    - standby-timeout-ac
+    - standby-timeout-dc
+    - hibernate-timeout-dc
+    - hibernate-timeout-ac
+  ignore_errors: true
+
+- ansible.builtin.import_tasks: windows-exporter.yml
+  tags: exporter
+
+- ansible.builtin.import_tasks: wsl.yml
+  tags: wsl
+
+- ansible.builtin.import_tasks: docker-desktop.yml
+  tags: docker
+
+# Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" -Name AUOptions -Value 2 # value 2 = notify before download
+# Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" -Name AutoInstallMinorUpdates -Value 0 # value 0 = minor updates are like other updates

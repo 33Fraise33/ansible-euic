@@ -1,0 +1,7 @@
+---
+- labels:
+    tenant: "Fanfinity"
+    site: "OTGKIT02"
+    node_name: "otgkit02sv01"
+  targets:
+    - 10.1.8.10

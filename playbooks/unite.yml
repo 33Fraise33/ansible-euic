@@ -1,0 +1,6 @@
+---
+- name: Run common role
+  hosts: gameservers
+  gather_facts: false
+  roles:
+    - win-pkm-unite

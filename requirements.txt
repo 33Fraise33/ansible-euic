@@ -1,0 +1,5 @@
+ansible
+ansible-lint
+yamllint
+passlib  # needed for macos hashing and encryption
+pywinrm  # needed to manage windows hosts, does not work on mac

@@ -1,0 +1,21 @@
+---
+# setup portainer with a docker container
+# container from: https://www.portainer.io/installation/
+
+- name: Create a volume for portainer config
+  community.docker.docker_volume:
+    name: config_portainer
+
+- name: Setup portainer docker container
+  community.docker.docker_container:
+    name: portainer
+    image: portainer/portainer-ce:latest
+    networks:
+      - name: host
+    volumes:
+      - config_portainer:/data
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    restart: true
+    restart_policy: always
+    state: started
+    pull: true

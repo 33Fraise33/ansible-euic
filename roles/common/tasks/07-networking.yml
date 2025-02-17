@@ -1,0 +1,20 @@
+---
+- name: NETWORKING - Copy sysctl file to enable ipv4/ipv6 forwarding
+  ansible.posix.sysctl:
+    name: "{{ item }}"
+    value: "{{ 1 if ip_forwarding | default(true) else 0 }}"
+    state: present
+  loop:
+    - "net.ipv4.ip_forward"
+    - "net.ipv6.conf.default.forwarding"
+    - "net.ipv6.conf.all.forwarding"
+
+- name: NETWORKING - Template interface file
+  ansible.builtin.template:
+    src: interfaces.j2
+    dest: /etc/network/interfaces
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart networking
+  when: interfaces is defined and interfaces != ""

@@ -1,0 +1,63 @@
+- name: Template bat file
+  ansible.windows.win_template:
+    src: pkm-unite-server.bat.j2
+    dest: C:\Users\{{ ansible_user }}\Desktop\pkm-unite-server.bat
+
+- name: Set Firewall rules for pokemon unite
+  community.windows.win_firewall_rule:
+    name: "{{ item.name }}"
+    localport: "{{ item.port }}"
+    action: allow
+    direction: in
+    protocol: "{{ item.protocol }}"
+    state: present
+    enabled: true
+  loop:
+    - name: unite-01
+      port: 56507
+      protocol: udp
+    - name: unite-02
+      port: 56508
+      protocol: udp
+    - name: unite-03
+      port: 6650
+      protocol: udp
+    - name: unite-04
+      port: 6788
+      protocol: udp
+  tags: firewall
+
+- name: Docker Login  # needs to be run as non admin
+  ansible.windows.win_command: docker login docker.io --username {{ docker_login_user }} --password-stdin
+  args:
+    stdin: "{{ docker_login_password }}"
+  become: true
+  become_method: runas
+  vars:
+    ansible_become_user: '{{ ansible_user }}'
+    ansible_become_pass: '{{ ansible_password }}'
+
+- name: Docker Pull Container  # needs to be run as logged in user - non admin
+  ansible.windows.win_command: docker pull docker.io/pokemon888/localsvr:wcs_usa_Honolulu1-tpc-oversea-online
+  become: true
+  become_method: runas
+  vars:
+    ansible_become_user: '{{ ansible_user }}'
+    ansible_become_pass: '{{ ansible_password }}'
+
+# docker run --privileged=true --name localsvr -d -p 56507:6650/udp -p 56508:6788/udp -v localsvr_283_%logflag%:/data/home/user00/sgame/log/ docker.io/pokemon888/localsvr:wcs_usa_Honolulu1-tpc-oversea-online --hostip={{ ansible_host }}
+# ??? docker exec -it -u root localsvr /bin/sh /data/home/user00/ieg_ci/rd_script/corefile.sh
+
+- name: Whitelist users in container  # needs to be run as logged in user - non admin
+  ansible.windows.win_command: docker exec -i -u root localsvr /bin/sh /data/home/user00/ieg_ci/rd_script/localsvr_add_whitelist.sh {{ item.id |replace("-", "") }}
+  become: true
+  become_method: runas
+  vars:
+    ansible_become_user: '{{ ansible_user }}'
+    ansible_become_pass: '{{ ansible_password }}'
+  loop: "{{ whitelist_users | default([]) }}"
+  tags: whitelist,wl
+  register: command_result
+  failed_when:
+    - "'start reload whitelist' not in command_result.stdout"
+

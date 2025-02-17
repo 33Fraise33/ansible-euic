@@ -1,0 +1,62 @@
+docker stop localsvr
+docker rm localsvr
+
+set /p logflag=<"log.flag"
+echo %logflag%
+
+set /a logflag+=1
+
+echo %logflag%
+echo %logflag% > "log.flag"
+
+@echo off
+docker run --privileged=true --name localsvr -d -p 56507:6650/udp -p 56508:6788/udp -v localsvr_283_%logflag%:/data/home/user00/sgame/log/ docker.io/pokemon888/localsvr:wcs_usa_Honolulu1-tpc-oversea-online --hostip={{ ansible_host }}
+
+if %errorlevel% NEQ 0 (
+echo "start fail"
+pause
+exit
+)
+
+timeout /T 10 /NOBREAK
+
+docker exec -it -u root localsvr /bin/sh /data/home/user00/ieg_ci/rd_script/corefile.sh
+
+docker logs  -t localsvr
+{% raw %}
+echo starting please wait......
+timeout /T 10 /NOBREAK
+
+for /f "delims= " %%i in ( 'docker inspect --format "{{json .State.Health.Status}}" localsvr') do set status=%%i 
+
+echo status %status%
+
+if %status% NEQ "healthy" (
+echo "start fail %status%" 
+pause
+exit
+)
+
+echo "---- start success! ----"
+echo ""
+
+:begin
+
+for /f "delims= " %%i in ( 'docker inspect --format "{{json .State.Health.Status}}" localsvr') do set status=%%i 
+
+if %status% NEQ "healthy" (
+echo "server status: %status%" 
+pause
+exit
+)
+
+echo "server status: %status%,  check number of  player, please wait......"
+timeout /T 20 /NOBREAK
+
+docker exec -it -u root localsvr /bin/sh /data/home/user00/ieg_ci/rd_script/monitor.sh
+
+goto begin
+
+pause
+exit
+{% endraw %}

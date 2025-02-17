@@ -1,0 +1,33 @@
+---
+- name: Create blackbox config directory
+  ansible.builtin.file:
+    path: "{{ docker.dir.config }}/prometheus_blackbox"
+    state: directory
+    mode: "0755"
+    owner: "{{ nobody.group }}"
+    group: "{{ nobody.group }}"
+
+- name: Copy blackbox config
+  ansible.builtin.copy:
+    src: blackbox.yml
+    dest: "{{ docker.dir.config }}/prometheus_blackbox/blackbox.yml"
+    owner: "{{ nobody.user }}"
+    group: "{{ nobody.group }}"
+    mode: "0755"
+
+# port = 9115
+- name: Setup prometheus blackbox exporter
+  community.docker.docker_container:
+    name: prometheus-blackbox_exporter
+    image: prom/blackbox-exporter:latest
+    networks:
+      - name: monitoring
+    volumes:
+      - "{{ docker.dir.config }}/prometheus_blackbox/blackbox.yml:/blackbox.yml:ro"
+    command: "--config.file=/blackbox.yml"
+    restart: true
+    restart_policy: always
+    state: started
+    pull: true
+    labels:
+      traefik.enable: "false"

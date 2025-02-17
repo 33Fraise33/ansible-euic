@@ -1,0 +1,15 @@
+---
+# for initial run don't forget --ask-become-pass and --ask-pass
+
+- name: Run common role
+  hosts: linux
+  gather_facts: false
+  connection: ssh
+  become: true
+  roles:
+    - common
+
+- name: Run common role
+  hosts: windows
+  roles:
+    - win-common

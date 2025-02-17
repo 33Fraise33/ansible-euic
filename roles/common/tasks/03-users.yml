@@ -1,0 +1,69 @@
+---
+- name: USER - Add group
+  ansible.builtin.group:
+    name: sudo
+
+- name: USER - install sudo package
+  ansible.builtin.package:
+    name:
+      - sudo
+    state: present
+    update_cache: true
+
+- name: USER - Add to host
+  ansible.builtin.user:
+    name: "{{ item.user }}"
+    comment: "{{ item.name }}"
+    groups: "{{ item.groups | default(omit) }}"
+    shell: /bin/bash
+    create_home: "{{ item.home | default(omit) }}"
+    append: "{{ true if item.groups is defined else false }}"
+  loop: "{{ users }}"
+  loop_control:
+    label: "{{ item.user }}"
+
+- name: USER - Set authorized key taken from file
+  ansible.posix.authorized_key:
+    user: "{{ item.user }}"
+    state: present
+    key: "{{ item.ssh_key }}"
+  loop: "{{ users }}"
+  when: item.ssh_key is defined
+  loop_control:
+    label: "{{ item.user }}"
+
+- name: USER - Allow sudo user group to have passwordless sudo
+  ansible.builtin.lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^%sudo'
+    line: '%sudo ALL=(ALL:ALL) NOPASSWD:ALL'
+
+- name: USER - Change ssh configs
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+    - regexp: '^(# *)?PermitRootLogin'
+      line: 'PermitRootLogin no'
+    - regexp: '^(# *)?UsePAM '
+      line: 'UsePAM yes'
+    - regexp: '^(# *)?PasswordAuthentication '
+      line: 'PasswordAuthentication no'
+    - regexp: '^(# *)?PermitEmptyPasswords '
+      line: 'PermitEmptyPasswords no'
+    - regexp: '^(# *)?ChallengeResponseAuthentication '
+      line: 'ChallengeResponseAuthentication no'
+    - regexp: '^(# *)?Port '
+      line: 'Port 22'
+  notify: Restart sshd
+
+- name: USER - delete debian user from host
+  ansible.builtin.user:
+    name: "debian"
+    state: absent
+  when: ansible_user|default() != "debian"
+
+- name: USER - Flush handlers
+  ansible.builtin.meta: flush_handlers

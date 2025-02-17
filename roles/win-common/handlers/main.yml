@@ -1,0 +1,3 @@
+- name: Reboot
+  ansible.windows.win_reboot:
+    post_reboot_delay: 20

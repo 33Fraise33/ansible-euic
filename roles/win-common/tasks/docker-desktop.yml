@@ -1,0 +1,26 @@
+---
+- name: Copy docker installer (if internet is slow)
+  ansible.windows.win_copy:
+    src: docker-installer.exe
+    dest: C:\Users\{{ ansible_user }}\Downloads\docker-installer.exe
+
+- name: Install Docker Desktop
+  ansible.windows.win_package:
+    #path: https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe
+    path: C:\Users\{{ ansible_user }}\Downloads\docker-installer.exe
+    creates_path: C:\Program Files\Docker\Docker\Docker Desktop.exe
+    arguments:
+      - install
+      - --quiet
+      - --norestart
+      - --accept-license
+      - --always-run-service
+  notify: Reboot
+
+- name: Add docker desktop to startup applications
+  community.windows.win_shortcut:
+    src: 'C:\Program Files\Docker\Docker\Docker Desktop.exe'
+    dest: 'C:\Users\{{ ansible_user }}\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\Docker Desktop.lnk'
+  
+- name: Flush handlers
+  meta: flush_handlers

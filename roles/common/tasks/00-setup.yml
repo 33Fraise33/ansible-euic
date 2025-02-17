@@ -1,0 +1,29 @@
+- name: SETUP - install sudo package
+  ansible.builtin.apt:
+    name:
+      - sudo
+    state: present
+  vars:
+    ansible_become_method: su
+
+- name: SETUP - Allow wheel user group to have passwordless sudo
+  ansible.builtin.lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^%sudo'
+    line: '%sudo ALL=(ALL:ALL) NOPASSWD:ALL'
+    validate: '/usr/sbin/visudo -cf %s'
+  vars:
+    ansible_become_method: su
+
+- name: SETUP - temporarily add debian to the sudo group
+  ansible.builtin.user:
+    name: "{{ ansible_user }}"
+    groups: sudo
+    append: true
+  vars:
+    ansible_become_method: su
+
+- name: SETUP - reset connection so sudo permission is recognized
+  ansible.builtin.meta: reset_connection
+

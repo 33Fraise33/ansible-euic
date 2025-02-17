@@ -1,0 +1,24 @@
+# setup openvpn with a docker container
+# container from: http://docs.grafana.org/installation/docker/
+---
+- name: Create a volume for grafana content
+  community.docker.docker_volume:
+    name: data_grafana
+
+- name: Setup grafana docker container
+  community.docker.docker_container:
+    name: grafana
+    image: grafana/grafana:latest
+    networks:
+      - name: monitoring
+    ports:
+      - 3000:3000
+    volumes:
+      - "data_grafana:/var/lib/grafana"
+    env:
+      GF_SERVER_ROOT_URL: "http://{{ ansible_host }}:3000"
+    restart: true
+    state: started
+    restart_policy: always
+    pull: true
+    user: 0:0

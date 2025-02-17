@@ -1,0 +1,30 @@
+---
+all:
+  children:
+    servers:
+      hosts:
+        otgkit02sv01:
+          ansible_host: 10.1.8.10
+    gameservers:
+      hosts:
+        euicserver01:
+          ansible_host: 172.16.50.233
+          ansible_user: MAV
+          ansible_password: user 
+          whitelist_users:
+            - id: 1039-3066-4012-9481-5515
+              comment: Fraise33 - Gianni Phone
+    # roles
+    monitoring:
+      hosts:
+        otgkit02sv01:
+    docker:
+      hosts:
+        otgkit02sv01:
+    # type
+    linux:
+      hosts:
+        otgkit02sv01:
+    windows:
+      hosts:
+        euicserver01:

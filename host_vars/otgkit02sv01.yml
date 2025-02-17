@@ -1,0 +1,22 @@
+---
+interfaces:
+  - name: enx000ec6bc6cdb
+    description: USB
+    mode: dhcp
+  - name: enp8s0
+    description: UNUSED
+    mode: manual
+
+docker:
+  users:
+    - fraise
+  dir:
+    config: /data/docker-config
+  networks:
+    monitoring:
+      type: bridge
+      hosts: []
+
+prometheus:
+  features:
+    blackbox: true

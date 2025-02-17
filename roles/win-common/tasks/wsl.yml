@@ -1,0 +1,59 @@
+---
+- name: Ensure Chocolatey itself is installed, using community repo for the bootstrap
+  chocolatey.chocolatey.win_chocolatey:
+    name: chocolatey
+
+- name: Install wsl2
+  chocolatey.chocolatey.win_chocolatey:
+    name: wsl2
+    state: present
+    package_params:
+      - /Retry:true
+      - /Version:2
+  notify: Reboot
+
+- name: Flush handlers
+  meta: flush_handlers
+
+# Fails
+# - name: Install WSL
+#   ansible.windows.win_command:
+#     cmd: 'C:\Windows\System32\wsl.exe --install'
+
+# - name: Install wsl part1
+#   ansible.windows.win_command:
+#     cmd: "powershell.exe Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux -NoRestart -All"
+#   # when: not enabled
+#   notify: Reboot
+
+# - name: Install wsl part2
+#   ansible.windows.win_command:
+#     cmd: "powershell.exe Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart -All"
+#   # when: not enabled
+#   notify: Reboot
+
+# - name: Flush handlers
+#   meta: flush_handlers
+
+# - name: copy wsl update binary (slow internet)
+#   ansible.windows.win_copy:
+#     src: wsl_update_x64.msi
+#     dest: C:\Users\{{ ansible_user }}\Downloads\wsl_update_x64.msi
+
+# #https://learn.microsoft.com/en-us/windows/wsl/install-manual
+# # FAILS
+# # - name: Install wsl update binary
+# #   ansible.windows.win_package:
+# #     path: C:\Users\{{ ansible_user }}\Downloads\wsl_update_x64.msi
+# #     arguments:
+# #       - /quiet
+# #       - /norestart
+
+# # FAILS
+# # - name: Update wsl
+# #   ansible.windows.win_command:
+# #     cmd: "powershell.exe wsl --update"
+
+# - name: Set wsl default version
+#   ansible.windows.win_command:
+#     cmd: 'powershell.exe wsl --set-default-version 2'

@@ -1,0 +1,40 @@
+---
+- name: Initial Setup tasks for clean host
+  ansible.builtin.include_tasks:
+    file: 00-setup.yml
+    apply:
+      tags:
+        - setup
+  when: initial_setup == "yes"
+
+- name: Gather host facts
+  ansible.builtin.setup:
+  tags: always
+
+- name: Run hostname tasks
+  ansible.builtin.import_tasks: 01-hostname.yml
+  tags: hostname
+
+- name: Run date tasks
+  ansible.builtin.import_tasks: 02-date.yml
+  tags: date
+
+- name: Run user tasks
+  ansible.builtin.import_tasks: 03-users.yml
+  tags: users
+
+- name: Run package tasks
+  ansible.builtin.import_tasks: 04-packages.yml
+  tags: packages
+
+- name: Run dns tasks
+  ansible.builtin.import_tasks: 05-dns.yml
+  tags: dns
+
+- name: Run node_exporter tasks
+  ansible.builtin.import_tasks: 06-node_exporter.yml
+  tags: node_exporter
+
+- name: Run networking tasks
+  ansible.builtin.import_tasks: 07-networking.yml
+  tags: networking

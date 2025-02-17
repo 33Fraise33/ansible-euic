@@ -1,0 +1,10 @@
+---
+- name: Setup monitoring (grafana & prometheus)
+  hosts: monitoring
+  connection: ssh
+  become: true
+  roles:
+    - role: prometheus
+      tags: prometheus
+    - role: grafana
+      tags: grafana

@@ -1,0 +1,16 @@
+# setup watchtower with a docker container
+# container from: https://www.portainer.io/installation/
+---
+- name: Set up watchtower
+  community.docker.docker_container:
+    name: watchtower
+    image: containrrr/watchtower:latest
+    command: --cleanup --interval 7200
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    restart: true
+    state: started
+    restart_policy: always
+    pull: true
+    labels:
+      traefik.enable: "false"

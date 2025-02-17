@@ -1,0 +1,61 @@
+# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
+source /etc/network/interfaces.d/*
+
+auto lo
+iface lo inet loopback
+# Loopback interface
+
+{% for intf in interfaces %}
+auto {{ intf.name }}
+iface {{ intf.name }} inet {{ intf.mode }}
+{%  if intf.mode == "dhcp" %}
+iface {{ intf.name }} inet6 auto
+{%  endif %}
+{%  if intf.mode == "static" %}
+	address {{ intf.ip }}
+{%    if intf.gateway is defined %}
+	gateway {{ intf.gateway }}
+{%    endif%}
+{%    if intf.dns is defined %}
+	dns-nameservers {{ intf.dns }}
+{%    endif%}
+{%    if intf.metric is defined %}
+	metric {{ intf.metric }}
+{%    endif%}
+{%    if intf.mac is defined %}
+	hw-address {{ intf.mac }}
+{%    endif%}
+{%  endif%}
+{%  if intf.mtu is defined %}
+	mtu {{ intf.mtu }}
+{%  endif %}
+{%  if intf.bridge is defined %}
+	bridge-ports {{ intf.bridge.ports }}
+	bridge-stp {{ intf.bridge.stp }}
+	bridge-fd {{ intf.bridge.fd | default('0') }}
+{%    if intf.bridge.vlan is defined %}
+	bridge-vlan-aware yes
+	bridge-vids {{ intf.bridge.vlan.vids }}
+{%    endif %}
+{%  endif %}
+{%  if intf.vlan is defined %}
+	vlan-id {{ intf.vlan.id }}
+	vlan-raw-device {{ intf.vlan.device }}
+{%  endif %}
+{%  if intf.bond is defined %}
+	bond-slaves {{ intf.bond.slaves | join(" ") }}
+	bond-mode {{ intf.bond.mode }}
+	bond-miimon 100
+	bond-xmit-hash-policy layer3+4
+{%  endif %}
+{%  if intf.script | default(false) %}
+	pre-up ifconfig $IFACE up
+	post-down ifconfig $IFACE down
+{%  endif%}
+{%  if intf.description is defined %}
+# {{ intf.description }}
+{%  endif%}
+
+{% endfor %}

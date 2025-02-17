@@ -1,0 +1,7 @@
+---
+- labels:
+    tenant: "Fanfinity"
+    site: "OTGKIT02"
+    node_name: "euicserver01"
+  targets:
+    - 172.16.50.233

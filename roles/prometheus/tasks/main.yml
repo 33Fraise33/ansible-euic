@@ -1,0 +1,12 @@
+# setup prometheus with a docker container
+# container from: https://prometheus.io/docs/prometheus/latest/installation/
+---
+
+- name: Setup blackbox exporter
+  ansible.builtin.import_tasks: blackbox_exporter.yml
+  tags: blackbox, blackbox_exporter, blackbox-exporter
+  when: prometheus.features.blackbox | default (true)
+
+- name: Setup prometheus
+  ansible.builtin.import_tasks: base.yml
+  tags: prometheus,base

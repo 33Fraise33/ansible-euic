@@ -1,0 +1,73 @@
+---
+- name: Debian based Setup
+  when: ansible_os_family == "Debian"
+  tags: install
+  block:
+    - name: Install docker dependency packages
+      ansible.builtin.apt:
+        name:
+          - ca-certificates
+          - curl
+          - gnupg
+        state: present
+    - name: Install docker gpg key
+      ansible.builtin.get_url:
+        url: https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg
+        dest: /etc/apt/trusted.gpg.d/docker.asc
+        mode: "0644"
+    - name: Add docker repo
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/docker.asc] \
+          https://download.docker.com/linux/\
+          {{ ansible_distribution | lower }} \
+          {{ ansible_distribution_release }} stable"
+        update_cache: true
+    - name: Install docker
+      ansible.builtin.apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+        state: present
+
+- name: Enable docker service
+  ansible.builtin.systemd:
+    name: docker
+    state: started
+    enabled: true
+
+- name: Create docker networks
+  community.docker.docker_network:
+    name: "{{ item.key }}"
+    driver: "{{ item.value.type | default('bridge') }}"
+    enable_ipv6: "{{ item.value.ipv6 | default(false) }}"
+    driver_options: "{{ item.value.driver_options | default(omit) }}"
+    ipam_config: "{{ item.value.ipam | default(omit) }}"
+  loop: "{{ docker.networks | dict2items }}"
+  tags: networks,network,ipam
+  notify: Restart docker
+
+- name: Change docker vars (including default subnet)
+  ansible.builtin.copy:
+    src: "{{ item.file }}"
+    dest: "{{ item.location }}{{ item.file }}"
+    owner: root
+    group: root
+    mode: "0644"
+  loop:
+    - file: daemon.json
+      location: /etc/docker/
+  notify: Restart docker
+
+- name: Log into DockerHub
+  community.docker.docker_login:
+    username: "{{ docker.login.username }}"
+    password: "{{ docker.login.password }}"
+  tags: docker_login
+
+- name: Ddd default_user to docker group
+  ansible.builtin.user:
+    name: "{{ item }}"
+    groups: docker
+    append: true
+  loop: "{{ docker.users }}"

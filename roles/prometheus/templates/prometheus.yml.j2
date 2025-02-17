@@ -1,0 +1,48 @@
+---
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  scrape_timeout: 10s
+
+rule_files:
+  - "alerts.d/*.yml"
+
+scrape_configs:
+  - job_name: 'blackbox_icmp'
+    metrics_path: /probe
+    params:
+      module: [icmp]
+    file_sd_configs:
+      - files:
+          - '/config/file_sd/targets_node.yml'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: "prometheus-blackbox_exporter:9115"
+
+  - job_name: 'node_exporter'
+    file_sd_configs:
+      - files:
+          - '/config/file_sd/targets_node.yml'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+      - source_labels: [__address__]
+        regex: (.*)
+        replacement: '$1:9100'
+        target_label: __address__
+    
+  - job_name: 'windows_exporter'
+    file_sd_configs:
+      - files:
+          - '/config/file_sd/targets_windows.yml'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+      - source_labels: [__address__]
+        regex: (.*)
+        replacement: '$1:9182'
+        target_label: __address__

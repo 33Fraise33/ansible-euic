@@ -1,0 +1,41 @@
+- name: Create a volume for logs config
+  community.docker.docker_volume:
+    name: logs_unite_server{{ now(utc=true) }}
+
+- name: Log into DockerHub
+  community.docker.docker_login:
+    username: "{{ docker_login_user }}"
+    password: "{{ docker_login_password }}"
+  tags: docker_login
+
+- name: Pull an image
+  community.docker.docker_image:
+    name: docker.io/pokemon888/localsvr:wcs_usa_Honolulu1-tpc-oversea-online
+    source: pull
+
+- name: Setup portainer docker container
+  community.docker.docker_container:
+    name: unite-localsvr
+    image: docker.io/pokemon888/localsvr:wcs_usa_Honolulu1-tpc-oversea-online
+    privileged: true
+    command:
+      - --hostip={{ ansible_host }}
+    ports: 
+      - 56507:6650/udp
+      - 56508:6788/udp
+    volumes:
+      - logs_unite_server:/data/home/user00/sgame/log/
+    restart: true
+    restart_policy: always
+    state: started
+
+- name: Add to whitelist
+  community.docker.docker_container_exec:
+    container: unite-server
+    user: root
+    command: /bin/sh /data/home/user00/ieg_ci/rd_script/localsvr_add_whitelist.sh {{ item.id | replace("-", "") }}
+  loop: "{{ whitelist_users | default([]) }}"
+
+
+# ??? docker exec -it -u root localsvr /bin/sh /data/home/user00/ieg_ci/rd_script/corefile.sh
+# /bin/sh /data/home/user00/ieg_ci/rd_script/localsvr_add_whitelist.sh <user-id>
