@@ -1,7 +1,7 @@
 - name: Template bat file
   ansible.windows.win_template:
     src: pkm-unite-server.bat.j2
-    dest: C:\Users\{{ ansible_user }}\Desktop\pkm-unite-server.bat
+    dest: '%UserProfile%\Desktop\pkm-unite-server.bat'
 
 - name: Set Firewall rules for pokemon unite
   community.windows.win_firewall_rule:
@@ -38,26 +38,22 @@
     ansible_become_pass: '{{ ansible_password }}'
 
 - name: Docker Pull Container  # needs to be run as logged in user - non admin
-  ansible.windows.win_command: docker pull docker.io/pokemon888/localsvr:wcs_usa_Honolulu1-tpc-oversea-online
+  ansible.windows.win_command: docker pull docker.io/pokemon888/localsvr:wcs_usa_Honolulu{{ unite_server_id }}-tpc-oversea-online
   become: true
   become_method: runas
   vars:
     ansible_become_user: '{{ ansible_user }}'
     ansible_become_pass: '{{ ansible_password }}'
 
-# docker run --privileged=true --name localsvr -d -p 56507:6650/udp -p 56508:6788/udp -v localsvr_283_%logflag%:/data/home/user00/sgame/log/ docker.io/pokemon888/localsvr:wcs_usa_Honolulu1-tpc-oversea-online --hostip={{ ansible_host }}
-# ??? docker exec -it -u root localsvr /bin/sh /data/home/user00/ieg_ci/rd_script/corefile.sh
-
 - name: Whitelist users in container  # needs to be run as logged in user - non admin
-  ansible.windows.win_command: docker exec -i -u root localsvr /bin/sh /data/home/user00/ieg_ci/rd_script/localsvr_add_whitelist.sh {{ item.id |replace("-", "") }}
+  ansible.windows.win_command: docker exec -i -u user00 localsvr /bin/sh /data/home/user00/ieg_ci/rd_script/localsvr_add_whitelist.sh {{ item.id |replace("-", "") }}
   become: true
   become_method: runas
   vars:
     ansible_become_user: '{{ ansible_user }}'
     ansible_become_pass: '{{ ansible_password }}'
   loop: "{{ whitelist_users | default([]) }}"
-  tags: whitelist,wl
+  tags: whitelist,wl,never
   register: command_result
   failed_when:
     - "'start reload whitelist' not in command_result.stdout"
-

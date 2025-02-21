@@ -10,7 +10,7 @@ echo %logflag%
 echo %logflag% > "log.flag"
 
 @echo off
-docker run --privileged=true --name localsvr -d -p 56507:6650/udp -p 56508:6788/udp -v localsvr_283_%logflag%:/data/home/user00/sgame/log/ docker.io/pokemon888/localsvr:wcs_usa_Honolulu1-tpc-oversea-online --hostip={{ ansible_host }}
+docker run --privileged=true --name localsvr -d -p 56507:6650/udp -p 56508:6788/udp -v localsvr_{{ unite_log_id }}_%logflag%:/data/home/user00/sgame/log/ docker.io/pokemon888/localsvr:wcs_usa_Honolulu{{ unite_server_id }}-tpc-oversea-online --hostip={{ ansible_host }}
 
 if %errorlevel% NEQ 0 (
 echo "start fail"

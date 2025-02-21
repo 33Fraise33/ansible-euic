@@ -59,12 +59,6 @@
       location: /etc/docker/
   notify: Restart docker
 
-- name: Log into DockerHub
-  community.docker.docker_login:
-    username: "{{ docker.login.username }}"
-    password: "{{ docker.login.password }}"
-  tags: docker_login
-
 - name: Ddd default_user to docker group
   ansible.builtin.user:
     name: "{{ item }}"

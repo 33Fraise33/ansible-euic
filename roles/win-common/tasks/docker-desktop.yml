@@ -2,12 +2,12 @@
 - name: Copy docker installer (if internet is slow)
   ansible.windows.win_copy:
     src: docker-installer.exe
-    dest: C:\Users\{{ ansible_user }}\Downloads\docker-installer.exe
+    dest: C:\docker-installer.exe
 
 - name: Install Docker Desktop
   ansible.windows.win_package:
     #path: https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe
-    path: C:\Users\{{ ansible_user }}\Downloads\docker-installer.exe
+    path: C:\docker-installer.exe
     creates_path: C:\Program Files\Docker\Docker\Docker Desktop.exe
     arguments:
       - install
@@ -20,7 +20,27 @@
 - name: Add docker desktop to startup applications
   community.windows.win_shortcut:
     src: 'C:\Program Files\Docker\Docker\Docker Desktop.exe'
-    dest: 'C:\Users\{{ ansible_user }}\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\Docker Desktop.lnk'
+    dest: 'C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp\Docker Desktop.lnk'
   
 - name: Flush handlers
   meta: flush_handlers
+
+- name: Expose docker host
+  ansible.windows.win_command:
+    cmd: 'netsh interface portproxy add v4tov4 listenport=3375 listenaddress=0.0.0.0 connectaddress=127.0.0.1 connectport=2375'
+  tags: expose
+
+- name: Set Firewall rules for expose
+  community.windows.win_firewall_rule:
+    name: "{{ item.name }}"
+    localport: "{{ item.port }}"
+    action: allow
+    direction: in
+    protocol: "{{ item.protocol }}"
+    state: present
+    enabled: true
+  loop:
+    - name: docker
+      port: 3375
+      protocol: tcp
+  tags: expose

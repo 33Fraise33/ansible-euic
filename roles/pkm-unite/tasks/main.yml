@@ -10,13 +10,13 @@
 
 - name: Pull an image
   community.docker.docker_image:
-    name: docker.io/pokemon888/localsvr:wcs_usa_Honolulu1-tpc-oversea-online
+    name: docker.io/pokemon888/localsvr:wcs_usa_Honolulu{{ unite_server_id }}-tpc-oversea-online
     source: pull
 
-- name: Setup portainer docker container
+- name: Setup unite docker container
   community.docker.docker_container:
     name: unite-localsvr
-    image: docker.io/pokemon888/localsvr:wcs_usa_Honolulu1-tpc-oversea-online
+    image: docker.io/pokemon888/localsvr:wcs_usa_Honolulu{{ unite_server_id }}-tpc-oversea-online
     privileged: true
     command:
       - --hostip={{ ansible_host }}

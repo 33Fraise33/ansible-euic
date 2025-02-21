@@ -1,0 +1,1 @@
+export DOCKER_HOST="tcp://10.130.0.52:3375"

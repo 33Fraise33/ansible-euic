@@ -2,6 +2,54 @@
 - labels:
     tenant: "Fanfinity"
     site: "OTGKIT02"
+    node_name: "mainserver"
+  targets:
+    - 10.125.0.50
+- labels:
+    tenant: "Fanfinity"
+    site: "OTGKIT02"
     node_name: "euicserver01"
   targets:
-    - 172.16.50.233
+    - 10.126.0.51
+- labels:
+    tenant: "Fanfinity"
+    site: "OTGKIT02"
+    node_name: "euicserver02"
+  targets:
+    - 10.127.0.50
+- labels:
+    tenant: "Fanfinity"
+    site: "OTGKIT02"
+    node_name: "euicserver03"
+  targets:
+    - 10.128.0.51
+- labels:
+    tenant: "Fanfinity"
+    site: "OTGKIT02"
+    node_name: "euicserver04"
+  targets:
+    - 10.129.0.51
+- labels:
+    tenant: "Fanfinity"
+    site: "OTGKIT02"
+    node_name: "euicserver05"
+  targets:
+    - 10.130.0.52
+- labels:
+    tenant: "Fanfinity"
+    site: "OTGKIT02"
+    node_name: "euicserver06"
+  targets:
+    - 10.131.0.51
+- labels:
+    tenant: "Fanfinity"
+    site: "OTGKIT02"
+    node_name: "euicserver07"
+  targets:
+    - 10.141.0.50
+- labels:
+    tenant: "Fanfinity"
+    site: "OTGKIT02"
+    node_name: "euicserver08"
+  targets:
+    - 10.141.0.51

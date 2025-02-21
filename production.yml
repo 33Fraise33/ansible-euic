@@ -7,13 +7,107 @@ all:
           ansible_host: 10.1.8.10
     gameservers:
       hosts:
-        euicserver01:
-          ansible_host: 172.16.50.233
-          ansible_user: MAV
-          ansible_password: user 
+        mainserver:
+          ansible_host: 10.125.0.50
+          ansible_user: asus7van4u
+          ansible_password: user
+          unite_server_id: 7
+          unite_log_id: 303
           whitelist_users:
-            - id: 1039-3066-4012-9481-5515
-              comment: Fraise33 - Gianni Phone
+            - id: 1065-7744-5551-6843-5946
+              comment: 092 - Mainstage - Main
+            - id: 1479-1285-5713-3152-3648
+              comment: 096 - Mainstage - Backup
+            - id: 0432-6466-5760-6160-3273
+              comment: xxx - Mainstage - OBSA - Main
+            - id: 1320-0783-5121-5859-9908
+              comment: xxx - Mainstage - OBSB - Backup
+            - id: 0258-8461-2126-6288-0733
+              comment: xxx - Maintstage - Admin
+        euicserver01:
+          ansible_host: 10.126.0.51
+          ansible_user: asus5van4u
+          ansible_password: user
+          unite_server_id: 1
+          unite_log_id: 298
+          whitelist_users:
+            - id: 0536-8563-2236-2015-7473
+              comment: 003 - SV01 - Main
+            - id: 0768-0441-4588-5097-3174
+              comment: 017 - SV01 - Backup
+        euicserver02:
+          ansible_host: 10.127.0.50
+          ansible_user: asus2van4u
+          ansible_password: user
+          unite_server_id: 2
+          unite_log_id: 298
+          whitelist_users:
+            - id: 0291-0183-6683-9432-3162
+              comment: 019 - SV02 - Main
+            - id: 1216-6255-2258-1353-0163
+              comment: 025 - SV02 - Backup
+        euicserver03:
+          ansible_host: 10.128.0.51
+          ansible_user: asus1van4u
+          ansible_password: user
+          unite_server_id: 3
+          unite_log_id: 299
+          whitelist_users:
+            - id: 1570-5449-3953-1253-7126
+              comment: 030 - SV03 - Main
+            - id: 0156-9724-8409-0873-4393
+              comment: 039 - SV03 - Backup
+        euicserver04:
+          ansible_host: 10.129.0.51
+          ansible_user: asus3van4u
+          ansible_password: user
+          unite_server_id: 4
+          unite_log_id: 300
+          whitelist_users:
+            - id: 1826-5848-0747-6252-5144
+              comment: 060 - SV04 - Main
+            - id: 1598-4532-2437-8984-3001
+              comment: 062 - SV04 - Backup
+        euicserver05:
+          ansible_host: 10.130.0.52
+          ansible_user: asus4van4u
+          ansible_password: user
+          unite_server_id: 5
+          unite_log_id: 301
+          whitelist_users:
+            - id: 1540-6215-5794-7332-2374
+              comment: 068 - SV05 - Main
+            - id: 0571-6320-6200-0504-9023
+              comment: 070 - SV05 - Backup
+        euicserver06:
+          ansible_host: 10.131.0.51
+          ansible_user: asus6van4u
+          ansible_password: user
+          unite_server_id: 6
+          unite_log_id: 302
+          whitelist_users:
+            - id: 0203-2936-3371-1675-3395
+              comment: 072 - SV06 - Main
+            - id: 0544-8797-1877-4721-2774
+              comment: 089 - SV06 - Backup
+        euicserver07:
+          ansible_host: 10.141.0.50
+          ansible_user: msi10van4u-renting
+          ansible_password: user
+          unite_server_id: _backup1
+          unite_log_id: 305
+          whitelist_users: 
+            - id: 0534-5454-0793-2276-6235
+              comment: xxx - Backup - Main
+            - id: 0454-9543-7527-1878-1493
+              comment: xxx - Backup - Backup
+        euicserver08:
+          ansible_host: 10.141.0.51
+          ansible_user: "msi 9"
+          ansible_password: user
+          unite_server_id: 8
+          unite_log_id: 304
+          whitelist_users: []
     # roles
     monitoring:
       hosts:
@@ -27,4 +121,12 @@ all:
         otgkit02sv01:
     windows:
       hosts:
+        mainserver:
         euicserver01:
+        euicserver02:
+        euicserver03:
+        euicserver04:
+        euicserver05:
+        euicserver06:
+        euicserver07:
+        euicserver08:
