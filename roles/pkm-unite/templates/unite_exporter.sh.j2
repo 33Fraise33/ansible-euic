@@ -1,0 +1,36 @@
+#!/bin/bash
+
+# Configuration
+LOG_FILE="{{ container_details.container.Mounts[0].Source }}/relaysvr_stat.log"
+OUTPUT_FILE="/var/lib/node_exporter/textfile_collector/unite{{ unite_srv.id }}_metrics.prom"
+TEMP_FILE="/tmp/mto_metrics{{ unite_srv.id }}.prom.tmp"
+SERVER_ID="{{ unite_srv.id }}"
+
+if [ ! -f "$LOG_FILE" ]; then
+    exit 1
+fi
+
+# Parsing logic
+# 1. grep gets the lines
+# 2. sed replaces ':', ',', and '):' with spaces to create clean columns
+# 3. awk then reliably picks the data by column number
+grep "\[MTO\] Unit" "$LOG_FILE" | tail -n 8 | \
+sed 's/):/ /g; s/:/ /g; s/,/ /g' | \
+awk -v svr="$SERVER_ID" '
+{
+    # Based on the cleaned line, the columns are now:
+    # $1=[MTO] $2=Unit(Idx= $3=0 $4=Name= $5=ST_Svr_Global_Data $6=Use $7=1 $8=Max $9=1 ...
+    
+    name = $5;
+    use_val = $7;
+    max_val = $9;
+    maxused_val = $13;
+
+    if (name != "") {
+        printf "unite_mto_unit_use{server=\"%s\",name=\"%s\"} %s\n", svr, name, use_val
+        printf "unite_mto_unit_max{server=\"%s\",name=\"%s\"} %s\n", svr, name, max_val
+        printf "unite_mto_unit_max_used{server=\"%s\",name=\"%s\"} %s\n", svr, name, maxused_val
+    }
+}' > "$TEMP_FILE"
+
+mv "$TEMP_FILE" "$OUTPUT_FILE"

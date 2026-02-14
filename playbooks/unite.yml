@@ -1,0 +1,6 @@
+---
+- name: Run common role
+  hosts: tag_pokemon_unite
+  gather_facts: false
+  roles:
+    - pkm-unite

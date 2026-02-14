@@ -1,0 +1,15 @@
+---
+- name: Log into DockerHub
+  community.docker.docker_login:
+    username: "{{ docker_login_user }}"
+    password: "{{ docker_login_password }}"
+  tags: docker_login
+
+- name: Setup Servers
+  ansible.builtin.include_tasks:
+    file: server-task.yml
+  tags: always
+  loop: "{{ unite_servers }}"
+  loop_control:
+    loop_var: unite_srv
+  when: servers_to_provision is not defined or ( unite_srv.id in servers_to_provision )

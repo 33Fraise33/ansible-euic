@@ -1,0 +1,12 @@
+[Install]
+WantedBy=timers.target
+
+[Unit]
+Description=Run custom unite metric script
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/root/unite_exporter{{ unite_srv.id }}.sh
+User=root
+Group=root

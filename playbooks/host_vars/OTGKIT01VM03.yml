@@ -1,0 +1,71 @@
+---
+servers_to_provision:
+      - "01"
+      - "03"
+      - "05"
+      - "07"
+      - "09"
+      - "11"
+      - "13"
+unite_servers:
+  - id: "01"
+    image: naic_Comp_Station1-tpc-oversea-online
+    network:
+      name: unite
+      ip: 10.10.41.66
+    whitelist_users:
+      - id: 1530-8323-2245-6369-7235
+        comment: EU-UNITE-01
+  - id: "03"
+    image: naic_Comp_Station3-tpc-oversea-online
+    network:
+      name: unite
+      ip: 10.10.41.67
+    whitelist_users:
+      - id: 1836-0626-1090-4410-9550
+        comment: EU-UNITE-03
+  - id: "05"
+    image: naic_Comp_Station5-tpc-oversea-online
+    network:
+      name: unite
+      ip: 10.10.41.68
+    whitelist_users:
+      - id: 1803-1131-1199-4917-2907
+        comment: EU-UNITE-05
+  - id: "07"
+    image: naic_Comp_Station7-tpc-oversea-online
+    network:
+      name: unite
+      ip: 10.10.41.69
+    whitelist_users:
+      - id: 1526-0587-2400-7644-8714
+        comment: EU-UNITE-07
+  - id: "09"
+    image: naic_Comp_Station9-tpc-oversea-online
+    network:
+      name: unite
+      ip: 10.10.41.70
+    whitelist_users:
+      - id:  0619-2260-8721-7483-9146
+        comment: EU-UNITE-09
+  - id: "11"
+    image: naic_Comp_Station11-tpc-oversea-online
+    network:
+      name: unite
+      ip: 10.10.41.71
+    whitelist_users:
+      - id: 1604-6415-3340-5909-3163
+        comment: EU-UNITE-11
+  - id: "13"
+    image: naic_Comp_Station13-tpc-oversea-online
+    network:
+      name: unite
+      ip: 10.10.41.72
+    whitelist_users:
+      - id: 1311-7737-1484-8679-5617
+        comment: EU-UNITE-13
+      - id: 0573-5803-7771-7830-4080
+        comment: 000 - IT - Gianni
+      - id: 1757-9070-2029-2920-4186
+        comment: Steam Deck - Test
+

@@ -1,0 +1,67 @@
+---
+servers_to_provision:
+      - "02"
+      - "04"
+      - "06"
+      - "08"
+      - "10"
+      - "12"
+      - "14"
+unite_servers:
+  - id: "02"
+    image: naic_Comp_Station2-tpc-oversea-online
+    network:
+      name: unite
+      ip: 10.10.41.2
+    whitelist_users:
+      - id: 1220-4200-6605-4364-6171
+        comment: EU-UNITE-02
+  - id: "04"
+    image: naic_Comp_Station4-tpc-oversea-online
+    network:
+      name: unite
+      ip: 10.10.41.3
+    whitelist_users:
+      - id: 0639-6064-7661-8724-7836
+        comment: EU-UNITE-04
+  - id: "06"
+    image: naic_Comp_Station6-tpc-oversea-online
+    network:
+      name: unite
+      ip: 10.10.41.4
+    whitelist_users:
+      - id: 1431-5101-3411-6805-1425
+        comment: EU-UNITE-06
+  - id: "08"
+    image: naic_Comp_Station8-tpc-oversea-online
+    network:
+      name: unite
+      ip: 10.10.41.5
+    whitelist_users:
+      - id: 1606-2304-7043-9510-1408
+        comment: EU-UNITE-08
+  - id: "10"
+    image: naic_Comp_Station10-tpc-oversea-online
+    network:
+      name: unite
+      ip: 10.10.41.6
+    whitelist_users:
+      - id: 1254-2336-9519-0994-1583
+        comment: EU-UNITE-10
+  - id: "12"
+    image: naic_Comp_Station12-tpc-oversea-online
+    network:
+      name: unite
+      ip: 10.10.41.7
+    whitelist_users:
+      - id: 0850-1274-5097-0503-5492
+        comment: EU-UNITE-12
+  - id: "14"
+    image: naic_Comp_Station14-tpc-oversea-online
+    network:
+      name: unite
+      ip: 10.10.41.8
+    whitelist_users:
+      - id: 0785-3890-6069-6404-6681
+        comment: EU-UNITE-14
+

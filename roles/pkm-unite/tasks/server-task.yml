@@ -1,0 +1,97 @@
+---
+- name: UNITE{{ unite_srv.id }} - Set log volume name  # noqa: name[template]
+  ansible.builtin.set_fact:
+    unite_log_volume: logs_unite{{ unite_srv.id }}_{{ now(utc=true, fmt='%Y-%m-%d_%H%M%S') }}
+
+- name: UNITE{{ unite_srv.id }} - Create a volume for logs config  # noqa: name[template]
+  community.docker.docker_volume:
+    name: "{{ unite_log_volume }}"
+
+# This can be moved to the main.yml task if we have 1 agnostic docker image
+- name: UNITE{{ unite_srv.id }} - Pull an image  # noqa: name[template]
+  community.docker.docker_image:
+    name: docker.io/pokemon888/localsvr:{{ unite_srv.image }}
+    source: pull
+
+- name: UNITE{{ unite_srv.id }} - Setup unite docker container  # noqa: name[template]
+  community.docker.docker_container:
+    name: unite{{ unite_srv.id }}
+    image: docker.io/pokemon888/localsvr:{{ unite_srv.image }}
+    privileged: true
+    dns_servers:
+      - 1.1.1.1
+      - 8.8.8.8
+    networks:
+      - name: "{{ unite_srv.network.name | default('bridge') }}"
+        ipv4_address: "{{ unite_srv.network.ip | default(omit) }}"
+    command:
+      # this is the ip that is forwarded to the unite client (when whitelisted below)
+      - --hostip={{ ansible_host if unite_srv.network is not defined else unite_srv.network.ip }}
+    # ports:  # handled by nftables ansible role
+    #   - 56507:6650/udp
+    #   - 56508:6788/udp
+    #   - 56509:10030/udp
+    volumes:
+      - "{{ unite_log_volume }}:/data/home/user00/sgame/log/"
+    recreate: "{{ unite_restart | default(false) }}"
+    restart_policy: always
+    state: healthy
+
+## this can not work, the script runs:
+## echo /data/corefile/core_%e_%t > /proc/sys/kernel/core_pattern
+## but this folder /data/corefile/ does not exist on the host + this is bad practice
+## not sure if this is the only reason the container is running as privileged
+# - name: Run the bash scripts that sets the coredump location
+#   community.docker.docker_container_exec:
+#     container: unite01
+#     user: root
+#     command: /bin/sh /data/home/user00/ieg_ci/rd_script/corefile.sh
+
+- name: UNITE{{ unite_srv.id }} - Add to whitelist  # noqa: name[template]
+  community.docker.docker_container_exec:
+    container: unite{{ unite_srv.id }}
+    user: user00
+    command: /bin/sh /data/home/user00/ieg_ci/rd_script/localsvr_add_whitelist.sh {{ item.id | replace("-", "") }}
+  loop: "{{ unite_srv.whitelist_users | default([]) }}"
+  register: command_result
+  failed_when:
+    - "'start reload whitelist' not in command_result.stdout"
+  tags: whitelist,never
+
+- name: UNITE{{ unite_srv.id }} - Get details of the container  # noqa: name[template]
+  community.docker.docker_container_info:
+    name: unite{{ unite_srv.id }}
+  register: container_details
+  tags: monitoring
+
+- name: UNITE{{ unite_srv.id }} - Add monitoring  # noqa: name[template]
+  ansible.builtin.template:
+    src: unite_exporter.sh.j2
+    dest: /root/unite_exporter{{ unite_srv.id }}.sh
+    mode: "0755"
+    owner: root
+    group: root
+  become: true
+  tags: monitoring
+
+- name: UNITE{{ unite_srv.id }} - Add service & Timer files  # noqa: name[template]
+  ansible.builtin.template:
+    src: unite_exporter.{{ item }}.j2
+    dest: /etc/systemd/system/unite_exporter{{ unite_srv.id }}.{{ item }}
+    mode: "0755"
+    owner: root
+    group: root
+  become: true
+  tags: monitoring
+  loop:
+    - service
+    - timer
+
+- name: UNITE{{ unite_srv.id }} - Reload systemd and enable timer  # noqa: name[template]
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: unite_exporter{{ unite_srv.id }}.timer
+    state: started
+    enabled: true
+  become: true
+  tags: monitoring

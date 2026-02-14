@@ -1,0 +1,10 @@
+[Unit]
+Description=Run custom unite metric script every 
+
+[Timer]
+OnBootSec=60
+OnUnitActiveSec=30
+RandomizedDelaySec=5
+
+[Install]
+WantedBy=timers.target
