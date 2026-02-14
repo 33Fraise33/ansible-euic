@@ -1,6 +1,5 @@
 # Ansible - Pokémon Unite LAN Server Setup
-<img src="assets/unite-championship-logo.png" height="200px" />
-<img src="assets/euic-logo.png" height="200px" />
+<img src="assets/unite-championship-logo.png" height="200px" /> <img src="assets/euic-logo.png" height="200px" />
 
 ## Overview
 <a href="assets/unite-overview.png"><img src="assets/unite-overview.png" width="60%" ></a>
