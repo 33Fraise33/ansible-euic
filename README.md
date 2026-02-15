@@ -106,6 +106,7 @@ After you have read the above carefully, run:
   - This would also help if more ports are being added in the future, this year a new port was added which was initially forgotten.
 - Sometimes there is an issue where more player are reported than actually in game.
   - 16 players on stage, 12 on normal stations while there are 15 on stage and 11 on normal stations.
+- Direct Feed at location of server operator. Issues will be seen the quickest like that.
 
 ## General issues
 - Phone not detecting ethernet (before starting game)
