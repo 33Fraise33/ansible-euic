@@ -74,6 +74,7 @@ This will also create a small script which exports the users from the logs into 
   - As the server is running DNAT anyway this indicates L2 is not required.
   - The routed setup allows us to give the host/admin a different phone and connecting the whole lobby to a different server (if the firewall allows this).
   - This setup allows a quick swap of a host device without having to have 2 phones per server or changing vlan of the clients to another server. 
+  - It matters the more that the clients are not connected to wifi as the primary default route will be used to connect to server.
 - The hostip passed to the docker container is the external ip clients will try to connect to when the cloud nudges the client to the local server.
 - During the lobby phase you will see udp packets towards 56509 to test the latency, this will also show the "local server connection speed" button in the client lobby.
 
